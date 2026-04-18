@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Contact{% endblock %}
+
+{% block content %}
+
+<style>
+.error-text{
+color:red;
+font-size:12px;
+margin-top:4px;
+}
+.input-error{
+border:1px solid red !important;
+}
+</style>
+
+<div class="max-w-6xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow">
+
+<h2 class="text-2xl font-bold mb-6">Add Contact</h2>
+
+<form id="contactForm" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+<!-- LEFT -->
+<div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">Company</label>
+<input type="text" name="company" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">Owner</label>
+<input type="text" name="owner" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">CEO</label>
+<input type="text" name="ceo" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">Manager</label>
+<input type="text" name="manager" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<!-- EMAIL -->
+<div class="mb-6" id="email-container">
+<label class="block mb-2 font-medium">Emails</label>
+
+<div class="flex gap-2 mb-2">
+<input type="email" name="email[]" class="w-full border p-2 rounded">
+<button type="button" onclick="removeEmail(this)" class="text-red-500 hidden remove-btn">✖</button>
+</div>
+
+<span class="error-text"></span>
+</div>
+
+<button type="button" onclick="addEmail()" class="text-blue-600 text-sm mb-6">+ Add Email</button>
+
+<!-- PHONE -->
+<div class="mb-6" id="phone-container">
+<label class="block mb-2 font-medium">Phones</label>
+
+<div class="flex gap-2 mb-2">
+<select name="code[]" class="border p-2 rounded">
+<option value="+91">+91</option>
+<option value="+1">+1</option>
+<option value="+44">+44</option>
+<option value="+61">+61</option>
+<option value="+971">+971</option>
+</select>
+
+<input type="text" name="phone[]" oninput="validatePhone(this)" class="w-full border p-2 rounded">
+<button type="button" onclick="removePhone(this)" class="text-red-500 hidden remove-btn">✖</button>
+</div>
+
+<span class="error-text"></span>
+</div>
+
+<button type="button" onclick="addPhone()" class="text-blue-600 text-sm mb-6">+ Add Phone</button>
+
+</div>
+
+<!-- RIGHT -->
+<div>
+
+<!-- SOCIAL -->
+<div class="mb-6" id="social-container">
+<label class="block mb-2 font-medium">Social Links</label>
+
+<div class="flex gap-2 mb-2">
+<select name="platform[]" class="border p-2 rounded">
+<option>Instagram</option>
+<option>LinkedIn</option>
+<option>Facebook</option>
+<option>Twitter</option>
+<option>Website</option>
+</select>
+
+<input type="url" name="link[]" class="w-full border p-2 rounded">
+<button type="button" onclick="removeSocial(this)" class="text-red-500 hidden remove-btn">✖</button>
+</div>
+
+<span class="error-text"></span>
+</div>
+
+<button type="button" onclick="addSocial()" class="text-blue-600 text-sm mb-6">+ Add Social</button>
+
+<!-- FRONT IMAGE -->
+<div class="mb-6">
+<label class="block mb-2 font-medium">Front Image</label>
+<input type="file" name="front_image" accept="image/*"
+onchange="previewImage(event,'frontPreview')" class="w-full border p-2 rounded">
+<img id="frontPreview" class="w-24 h-24 mt-2 rounded-lg border object-cover hidden">
+<span class="error-text"></span>
+</div>
+
+<!-- BACK IMAGE -->
+<div class="mb-6">
+<label class="block mb-2 font-medium">Back Image</label>
+<input type="file" name="back_image" accept="image/*"
+onchange="previewImage(event,'backPreview')" class="w-full border p-2 rounded">
+<img id="backPreview" class="w-24 h-24 mt-2 rounded-lg border object-cover hidden">
+<span class="error-text"></span>
+</div>
+
+<!-- QR -->
+<div class="mb-6">
+<label class="block mb-2 font-medium">QR Code (Optional)</label>
+<input type="file" name="qr_image" accept="image/*"
+onchange="previewImage(event,'qrPreview')" class="w-full border p-2 rounded">
+<img id="qrPreview" class="w-24 h-24 mt-2 rounded-lg border object-cover hidden">
+</div>
+
+<!-- ADDRESS -->
+<div class="mb-6">
+<label class="block text-sm font-medium mb-1">Address</label>
+<textarea name="address" rows="3" class="w-full border rounded-lg p-2"></textarea>
+<span class="error-text"></span>
+</div>
+
+</div>
+</div>
+
+<div class="mt-6 flex gap-4">
+<button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded">Submit</button>
+</div>
+<!-- SUCCESS POPUP -->
+<div id="successPopup" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white w-[320px] p-6 rounded-xl shadow-lg text-center">
+
+    <div class="text-green-500 text-5xl mb-3">✔</div>
+
+    <h2 class="text-xl font-bold mb-2">Success!</h2>
+
+    <p class="text-gray-600 mb-4">Contact saved successfully.</p>
+
+    <button type="button" onclick="confirmSubmit()" class="bg-blue-600 text-white px-4 py-2 rounded">
+      OK
+    </button>
+
+  </div>
+
+</div>
+</form>
+</div>
+
+<script>
+  let formToSubmit = null;
+
+// ===== PHONE =====
+function validatePhone(input){
+input.value = input.value.replace(/[^0-9]/g,'').slice(0,10);
+}
+
+// ===== IMAGE PREVIEW =====
+function previewImage(event,id){
+const file=event.target.files[0];
+if(!file) return;
+
+const reader=new FileReader();
+reader.onload=function(e){
+document.getElementById(id).src=e.target.result;
+document.getElementById(id).classList.remove("hidden");
+};
+reader.readAsDataURL(file);
+}
+
+// ===== ERROR CLEAR =====
+document.querySelectorAll("input, textarea, select").forEach(input=>{
+input.addEventListener("input", clearError);
+input.addEventListener("change", clearError);
+});
+
+function clearError(){
+this.classList.remove("input-error");
+let box=this.closest(".mb-6")?.querySelector(".error-text");
+if(box) box.innerText="";
+}
+
+// ===== REMOVE BUTTON LOGIC =====
+function updateEmailRemoveButtons(){
+const rows=document.querySelectorAll("#email-container .flex");
+rows.forEach(row=>{
+let btn=row.querySelector(".remove-btn");
+if(btn) btn.style.display = rows.length > 1 ? "inline-block" : "none";
+});
+}
+
+function updatePhoneRemoveButtons(){
+const rows=document.querySelectorAll("#phone-container .flex");
+rows.forEach(row=>{
+let btn=row.querySelector(".remove-btn");
+if(btn) btn.style.display = rows.length > 1 ? "inline-block" : "none";
+});
+}
+
+function updateSocialRemoveButtons(){
+const rows=document.querySelectorAll("#social-container .flex");
+rows.forEach(row=>{
+let btn=row.querySelector(".remove-btn");
+if(btn) btn.style.display = rows.length > 1 ? "inline-block" : "none";
+});
+}
+
+window.addEventListener("load",function(){
+updateEmailRemoveButtons();
+updatePhoneRemoveButtons();
+updateSocialRemoveButtons();
+});
+
+// ===== VALIDATION (FIXED - ONLY ADDITION) =====
+document.getElementById("contactForm").addEventListener("submit", function(e){
+e.preventDefault();
+
+document.querySelectorAll(".error-text").forEach(e=>e.innerText="");
+document.querySelectorAll("input, textarea").forEach(e=>e.classList.remove("input-error"));
+
+let valid=true;
+
+function setError(input,msg){
+let box=input.closest(".mb-6")?.querySelector(".error-text");
+if(box) box.innerText=msg;
+input.classList.add("input-error");
+valid=false;
+}
+
+let company=document.querySelector("input[name='company']");
+let owner=document.querySelector("input[name='owner']");
+let ceo=document.querySelector("input[name='ceo']");
+let manager=document.querySelector("input[name='manager']");
+let address=document.querySelector("textarea[name='address']");
+
+if(company.value.trim()==="") setError(company,"Company required");
+if(owner.value.trim()==="") setError(owner,"Owner required");
+if(ceo.value.trim()==="") setError(ceo,"CEO required");
+if(manager.value.trim()==="") setError(manager,"Manager required");
+if(address.value.trim()==="") setError(address,"Address required");
+
+// EMAIL (FIXED PER INPUT)
+document.querySelectorAll("input[name='email[]']").forEach(input=>{
+let box=document.querySelector("#email-container .error-text");
+if(input.value.trim()===""){
+input.classList.add("input-error");
+box.innerText="Each email is required";
+valid=false;
+}
+});
+
+// PHONE
+document.querySelectorAll("input[name='phone[]']").forEach(input=>{
+let box=document.querySelector("#phone-container .error-text");
+if(input.value.trim()===""){
+input.classList.add("input-error");
+box.innerText="Each phone is required";
+valid=false;
+}
+else if(input.value.length!==10){
+input.classList.add("input-error");
+box.innerText="Must be 10 digits";
+valid=false;
+}
+});
+
+// SOCIAL
+document.querySelectorAll("input[name='link[]']").forEach(input=>{
+let box=document.querySelector("#social-container .error-text");
+if(input.value.trim()===""){
+input.classList.add("input-error");
+box.innerText="Each link is required";
+valid=false;
+}
+});
+
+if(!valid) return;
+
+if(!valid) return;
+
+formToSubmit = this;
+showPopup();
+return false;
+});
+
+    function addEmail(){
+const container = document.getElementById("email-container");
+
+if(!container){
+console.error("email-container not found");
+return;
+}
+
+container.insertAdjacentHTML("beforeend",`
+<div class="flex gap-2 mb-2">
+<input type="email" name="email[]" class="w-full border p-2 rounded">
+<button type="button"
+onclick="this.parentElement.remove(); clearEmailError(); updateEmailRemoveButtons();"
+class="text-red-500 remove-btn">✖</button>
+</div>`);
+
+if(typeof updateEmailRemoveButtons === "function"){
+updateEmailRemoveButtons();
+}
+}
+
+    function addPhone(){
+const container = document.getElementById("phone-container");
+
+if(!container) return;
+
+container.insertAdjacentHTML("beforeend",`
+<div class="flex gap-2 mb-2">
+<select name="code[]" class="border p-2 rounded">
+<option value="+91">+91</option>
+<option value="+1">+1</option>
+<option value="+44">+44</option>
+<option value="+61">+61</option>
+<option value="+971">+971</option>
+</select>
+
+<input type="text" name="phone[]" oninput="validatePhone(this)" class="w-full border p-2 rounded">
+
+<button type="button"
+onclick="this.parentElement.remove(); clearPhoneError(); updatePhoneRemoveButtons();"
+class="text-red-500 remove-btn">✖</button>
+</div>`);
+
+if(typeof updatePhoneRemoveButtons === "function"){
+updatePhoneRemoveButtons();
+}
+}
+    function addSocial(){
+const container = document.getElementById("social-container");
+
+if(!container) return;
+
+container.insertAdjacentHTML("beforeend",`
+<div class="flex gap-2 mb-2">
+<select name="platform[]" class="border p-2 rounded">
+<option>Instagram</option>
+<option>LinkedIn</option>
+<option>Facebook</option>
+<option>Twitter</option>
+<option>Website</option>
+</select>
+
+<input type="url" name="link[]" class="w-full border p-2 rounded">
+
+<button type="button"
+onclick="this.parentElement.remove(); clearSocialError(); updateSocialRemoveButtons();"
+class="text-red-500 remove-btn">✖</button>
+</div>`);
+
+if(typeof updateSocialRemoveButtons === "function"){
+updateSocialRemoveButtons();
+}
+}
+
+    function removeEmail(btn){
+btn.parentElement.remove();
+clearContainerError("email-container");
+updateEmailRemoveButtons();
+}
+
+function removePhone(btn){
+btn.parentElement.remove();
+clearContainerError("phone-container");
+updatePhoneRemoveButtons();
+}
+
+function removeSocial(btn){
+btn.parentElement.remove();
+clearContainerError("social-container");
+updateSocialRemoveButtons();
+}
+
+// COMMON ERROR CLEANER
+function clearContainerError(containerId){
+let container = document.getElementById(containerId);
+if(!container) return;
+
+// clear error text
+let errorBox = container.querySelector(".error-text");
+if(errorBox){
+errorBox.innerText = "";
+}
+
+// remove red borders from inputs inside that container
+container.querySelectorAll("input, select").forEach(el=>{
+el.classList.remove("input-error");
+});
+}
+    function clearEmailError(){
+const container=document.getElementById("email-container");
+if(!container) return;
+
+container.querySelector(".error-text").innerText="";
+container.querySelectorAll("input").forEach(i=>{
+i.classList.remove("input-error");
+});
+}
+
+function clearPhoneError(){
+const container=document.getElementById("phone-container");
+if(!container) return;
+
+container.querySelector(".error-text").innerText="";
+container.querySelectorAll("input").forEach(i=>{
+i.classList.remove("input-error");
+});
+}
+
+function clearSocialError(){
+const container=document.getElementById("social-container");
+if(!container) return;
+
+container.querySelector(".error-text").innerText="";
+container.querySelectorAll("input").forEach(i=>{
+i.classList.remove("input-error");
+});
+}
+
+    function showPopup(){
+document.getElementById("successPopup").classList.remove("hidden");
+}
+
+function closePopup(){
+document.getElementById("successPopup").classList.add("hidden");
+}
+
+  function confirmSubmit(){
+closePopup();
+
+if(formToSubmit){
+formToSubmit.submit();
+formToSubmit = null;
+}
+}
+
+<!--// SAVE DATA-->
+document.querySelectorAll("#contactForm input, #contactForm textarea, #contactForm select")
+.forEach(el => {
+    el.addEventListener("input", () => {
+        const formData = {};
+        document.querySelectorAll("#contactForm input, #contactForm textarea, #contactForm select")
+        .forEach(field => {
+            if(field.name){
+                formData[field.name] = field.value;
+            }
+        });
+        localStorage.setItem("contactFormData", JSON.stringify(formData));
+    });
+});
+
+
+<!--// LOAD DATA-->
+window.addEventListener("load", () => {
+    const savedData = localStorage.getItem("contactFormData");
+    if(savedData){
+        const formData = JSON.parse(savedData);
+        Object.keys(formData).forEach(name => {
+            const field = document.querySelector(`[name="${name}"]`);
+            if(field){
+                field.value = formData[name];
+            }
+        });
+    }
+});
+
+
+<!--// CLEAR AFTER SUBMIT-->
+document.getElementById("contactForm").addEventListener("submit", () => {
+    localStorage.removeItem("contactFormData");
+});
+</script>
+
+{% endblock %}
