@@ -1,0 +1,107 @@
+<!--{% extends 'base.html' %}-->
+
+<!--{% block title %}View Contact{% endblock %}-->
+
+<!--{% block content %}-->
+
+<!--<div class="max-w-5xl mx-auto">-->
+
+<!--    &lt;!&ndash; HEADER &ndash;&gt;-->
+<!--    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">-->
+<!--        <div>-->
+<!--            <h1 class="text-3xl font-bold text-gray-800">{{ contact.company }}</h1>-->
+<!--            <p class="text-gray-500">Owner: {{ contact.owner }}</p>-->
+<!--        </div>-->
+
+<!--        <a href="{% url 'list' %}" -->
+<!--           class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">-->
+<!--            ← Back to List-->
+<!--        </a>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; MAIN CARD &ndash;&gt;-->
+<!--    <div class="bg-white rounded-2xl shadow p-6 md:p-8">-->
+
+<!--        &lt;!&ndash; IMAGES &ndash;&gt;-->
+<!--        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">-->
+<!--            <div>-->
+<!--                <h3 class="font-semibold mb-2 text-gray-700">Front Image</h3>-->
+<!--                <img src="{{ contact.front_image.url }}"-->
+<!--                     class="w-full h-64 object-cover rounded-xl border hover:scale-105 transition">-->
+<!--            </div>-->
+
+<!--            <div>-->
+<!--                <h3 class="font-semibold mb-2 text-gray-700">Back Image</h3>-->
+<!--                <img src="{{ contact.back_image.url }}"-->
+<!--                     class="w-full h-64 object-cover rounded-xl border hover:scale-105 transition">-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; GRID DETAILS &ndash;&gt;-->
+<!--        <div class="grid md:grid-cols-2 gap-8">-->
+
+<!--            &lt;!&ndash; EMAILS &ndash;&gt;-->
+<!--            <div>-->
+<!--                <h3 class="text-lg font-semibold mb-3 text-blue-700">Emails</h3>-->
+
+<!--                <div class="space-y-2">-->
+<!--                    {% for email in contact.get_email_list %}-->
+<!--                        <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg shadow-sm">-->
+<!--                            {{ email }}-->
+<!--                        </div>-->
+<!--                    {% empty %}-->
+<!--                        <p class="text-gray-400">No emails added</p>-->
+<!--                    {% endfor %}-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; PHONES &ndash;&gt;-->
+<!--            <div>-->
+<!--                <h3 class="text-lg font-semibold mb-3 text-green-700">Phones</h3>-->
+
+<!--                <div class="space-y-2">-->
+<!--                    {% for phone in contact.get_phone_list %}-->
+<!--                        <div class="bg-green-50 text-green-700 px-4 py-2 rounded-lg shadow-sm">-->
+<!--                            {{ phone }}-->
+<!--                        </div>-->
+<!--                    {% empty %}-->
+<!--                        <p class="text-gray-400">No phones added</p>-->
+<!--                    {% endfor %}-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--        </div>-->
+
+<!--        &lt;!&ndash; SOCIAL LINKS &ndash;&gt;-->
+<!--        <div class="mt-10">-->
+<!--            <h3 class="text-lg font-semibold mb-4 text-purple-700">Social Links</h3>-->
+
+<!--            <div class="space-y-3">-->
+<!--                {% for item in contact.social_links.split(",") %}-->
+<!--                    {% if item %}-->
+<!--                        {% with parts=item.split(":") %}-->
+<!--                            <div class="flex justify-between items-center bg-gray-100 p-3 rounded-lg">-->
+
+<!--                                <span class="font-medium text-gray-700">-->
+<!--                                    {{ parts.0 }}-->
+<!--                                </span>-->
+
+<!--                                <a href="{{ parts.1 }}" target="_blank"-->
+<!--                                   class="text-blue-600 hover:underline text-sm">-->
+<!--                                    Visit →-->
+<!--                                </a>-->
+
+<!--                            </div>-->
+<!--                        {% endwith %}-->
+<!--                    {% endif %}-->
+<!--                {% empty %}-->
+<!--                    <p class="text-gray-400">No social links</p>-->
+<!--                {% endfor %}-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--    </div>-->
+
+<!--</div>-->
+
+<!--{% endblock %}-->
