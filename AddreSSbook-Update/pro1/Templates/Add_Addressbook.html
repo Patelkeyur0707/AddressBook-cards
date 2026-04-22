@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Contact{% endblock %}
+
+{% block content %}
+
+<style>
+.error-text{
+color:red;
+font-size:12px;
+margin-top:4px;
+}
+.input-error{
+border:1px solid red !important;
+}
+</style>
+
+<div class="max-w-6xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow">
+
+<h2 class="text-2xl font-bold mb-6">Add Contact</h2>
+
+<form id="contactForm" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+<!-- LEFT -->
+<div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">Company</label>
+<input type="text" name="company" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">Owner</label>
+<input type="text" name="owner" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">CEO</label>
+<input type="text" name="ceo" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<div class="mb-6">
+<label class="block mb-2 font-medium">Manager</label>
+<input type="text" name="manager" class="w-full border p-2 rounded">
+<span class="error-text"></span>
+</div>
+
+<!-- EMAIL -->
+<div class="mb-6" id="email-container">
+<label class="block mb-2 font-medium">Emails</label>
+
+<div class="flex gap-2 mb-2">
+<input type="email" name="email[]" class="w-full border p-2 rounded">
+<button type="button" onclick="removeEmail(this)" class="text-red-500 hidden remove-btn">✖</button>
+</div>
+
+<span class="error-text"></span>
+</div>
+
+<button type="button" onclick="addEmail()" class="text-blue-600 text-sm mb-6">+ Add Email</button>
+
+<!-- PHONE -->
+<div class="mb-6" id="phone-container">
+<label class="block mb-2 font-medium">Phones</label>
+
+<div class="flex gap-2 mb-2">
+<select name="code[]" class="border p-2 rounded">
+<option value="+91">+91</option>
+<option value="+1">+1</option>
+<option value="+44">+44</option>
+<option value="+61">+61</option>
+<option value="+971">+971</option>
+</select>
+
+<input type="text" name="phone[]" oninput="validatePhone(this)" class="w-full border p-2 rounded">
+<button type="button" onclick="removePhone(this)" class="text-red-500 hidden remove-btn">✖</button>
+</div>
+
+<span class="error-text"></span>
+</div>
+
+<button type="button" onclick="addPhone()" class="text-blue-600 text-sm mb-6">+ Add Phone</button>
+
+</div>
+
+<!-- RIGHT -->
+<div>
+
+<!-- SOCIAL -->
+<div class="mb-6" id="social-container">
+<label class="block mb-2 font-medium">Social Links</label>
+
+<div class="flex gap-2 mb-2">
+<select name="platform[]" class="border p-2 rounded">
+<option>Instagram</option>
+<option>LinkedIn</option>
+<option>Facebook</option>
+<option>Twitter</option>
+<option>Website</option>
+</select>
+
+<input type="url" name="link[]" class="w-full border p-2 rounded">
+<button type="button" onclick="removeSocial(this)" class="text-red-500 hidden remove-btn">✖</button>
+</div>
+
+<span class="error-text"></span>
+</div>
+
+<button type="button" onclick="addSocial()" class="text-blue-600 text-sm mb-6">+ Add Social</button>
+
+<!-- FRONT IMAGE -->
+<div class="mb-6">
+<label class="block mb-2 font-medium">Front Image</label>
+<input type="file" name="front_image" accept="image/*"
+onchange="previewImage(event,'frontPreview')" class="w-full border p-2 rounded">
+<img id="frontPreview" class="w-24 h-24 mt-2 rounded-lg border object-cover hidden">
+<span class="error-text"></span>
+</div>
+
+<!-- BACK IMAGE -->
+<div class="mb-6">
+<label class="block mb-2 font-medium">Back Image</label>
+<input type="file" name="back_image" accept="image/*"
+onchange="previewImage(event,'backPreview')" class="w-full border p-2 rounded">
+<img id="backPreview" class="w-24 h-24 mt-2 rounded-lg border object-cover hidden">
+<span class="error-text"></span>
+</div>
+
+<!-- QR -->
+<div class="mb-6">
+<label class="block mb-2 font-medium">QR Code (Optional)</label>
+<input type="file" name="qr_image" accept="image/*"
+onchange="previewImage(event,'qrPreview')" class="w-full border p-2 rounded">
+<img id="qrPreview" class="w-24 h-24 mt-2 rounded-lg border object-cover hidden">
+</div>
+
+<!-- ADDRESS -->
+<div class="mb-6">
+<label class="block text-sm font-medium mb-1">Address</label>
+<textarea name="address" rows="3" class="w-full border rounded-lg p-2"></textarea>
+<span class="error-text"></span>
+</div>
+
+</div>
+</div>
+
+<div class="mt-6 flex gap-4">
+<button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded">Submit</button>
+</div>
+<!-- SUCCESS POPUP -->
+<div id="successPopup" class="{% if success %}fixed{% else %}hidden{% endif %} inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white w-[320px] p-6 rounded-xl shadow-lg text-center">
+
+    <div class="text-green-500 text-5xl mb-3">✔</div>
+
+    <h2 class="text-xl font-bold mb-2">Success!</h2>
+
+    <p class="text-gray-600 mb-4">Contact created successfully.</p>
+
+    <button type="button" onclick="window.location.href=''" class="bg-blue-600 text-white px-4 py-2 rounded">
+        OK
+    </button>
+
+  </div>
+
+</div>
+</form>
+</div>
+
+<script>
+
+// ===== PHONE =====
+function validatePhone(input){
+    input.value = input.value.replace(/[^0-9]/g,'').slice(0,10);
+}
+
+// ===== IMAGE PREVIEW =====
+function previewImage(event,id){
+    const file = event.target.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+        document.getElementById(id).src = e.target.result;
+        document.getElementById(id).classList.remove("hidden");
+    };
+    reader.readAsDataURL(file);
+}
+
+// ===== ERROR CLEAR =====
+document.addEventListener("input", function(e){
+    if(e.target.matches("input, textarea, select")){
+        e.target.classList.remove("input-error");
+        let box = e.target.closest(".mb-6")?.querySelector(".error-text");
+        if(box) box.innerText = "";
+    }
+});
+
+// ===== REMOVE BUTTON LOGIC =====
+function updateButtons(containerId){
+    const rows = document.querySelectorAll(`#${containerId} .flex`);
+    rows.forEach(row=>{
+        let btn = row.querySelector(".remove-btn");
+        if(btn){
+            btn.style.display = rows.length > 1 ? "inline-block" : "none";
+        }
+    });
+}
+
+window.addEventListener("load",function(){
+    updateButtons("email-container");
+    updateButtons("phone-container");
+    updateButtons("social-container");
+});
+
+// ===== FORM VALIDATION =====
+document.getElementById("contactForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    document.querySelectorAll(".error-text").forEach(el => el.innerText = "");
+    document.querySelectorAll("input, textarea").forEach(el => el.classList.remove("input-error"));
+
+    let valid = true;
+
+    function setError(input, msg){
+        let box = input.closest(".mb-6")?.querySelector(".error-text");
+        if(box) box.innerText = msg;
+        input.classList.add("input-error");
+        valid = false;
+    }
+
+    function hasDuplicates(arr){
+        return new Set(arr).size !== arr.length;
+    }
+
+    let company = document.querySelector("input[name='company']");
+    let owner = document.querySelector("input[name='owner']");
+    let ceo = document.querySelector("input[name='ceo']");
+    let manager = document.querySelector("input[name='manager']");
+    let address = document.querySelector("textarea[name='address']");
+    let frontImage = document.querySelector("input[name='front_image']");
+    let backImage = document.querySelector("input[name='back_image']");
+
+    // ===== REQUIRED TEXT FIELDS =====
+    if(company.value.trim() === "") setError(company, "Company required");
+    if(owner.value.trim() === "") setError(owner, "Owner required");
+    if(ceo.value.trim() === "") setError(ceo, "CEO required");
+    if(manager.value.trim() === "") setError(manager, "Manager required");
+    if(address.value.trim() === "") setError(address, "Address required");
+
+    // ===== DUPLICATE TEXT FIELDS =====
+    let names = [
+        company.value.trim().toLowerCase(),
+        owner.value.trim().toLowerCase(),
+        ceo.value.trim().toLowerCase(),
+        manager.value.trim().toLowerCase()
+    ].filter(v => v !== "");
+
+    if(hasDuplicates(names)){
+        setError(company, "Duplicate values not allowed in company/owner/ceo/manager");
+    }
+
+    // ===== IMAGE REQUIRED =====
+    if(frontImage.files.length === 0) setError(frontImage, "Front image required");
+    if(backImage.files.length === 0) setError(backImage, "Back image required");
+
+    // ===== IMAGE DUPLICATE CHECK =====
+    if(frontImage.files.length && backImage.files.length){
+        if(frontImage.files[0].name === backImage.files[0].name){
+            setError(backImage, "Front and Back image cannot be same as front image");
+        }
+    }
+
+    // ===== EMAIL VALIDATION =====
+    let emailInputs = document.querySelectorAll("input[name='email[]']");
+    let emails = [];
+
+    emailInputs.forEach(input=>{
+        let val = input.value.trim().toLowerCase();
+        if(val === ""){
+            input.classList.add("input-error");
+            document.querySelector("#email-container .error-text").innerText = "Each email is required";
+            valid = false;
+        } else {
+            emails.push(val);
+        }
+    });
+
+    if(hasDuplicates(emails)){
+        document.querySelector("#email-container .error-text").innerText = "Duplicate emails not allowed";
+        valid = false;
+    }
+
+    // ===== PHONE VALIDATION =====
+    let phoneInputs = document.querySelectorAll("input[name='phone[]']");
+    let phones = [];
+
+    phoneInputs.forEach(input=>{
+        let val = input.value.trim();
+        if(val === ""){
+            input.classList.add("input-error");
+            document.querySelector("#phone-container .error-text").innerText = "Each phone is required";
+            valid = false;
+        }
+        else if(val.length !== 10){
+            input.classList.add("input-error");
+            document.querySelector("#phone-container .error-text").innerText = "Must be 10 digits";
+            valid = false;
+        } else {
+            phones.push(val);
+        }
+    });
+
+    if(hasDuplicates(phones)){
+        document.querySelector("#phone-container .error-text").innerText = "Duplicate phone numbers not allowed";
+        valid = false;
+    }
+
+    // ===== SOCIAL VALIDATION =====
+    let socialInputs = document.querySelectorAll("input[name='link[]']");
+    let socials = [];
+
+    socialInputs.forEach(input=>{
+        let val = input.value.trim().toLowerCase();
+        if(val === ""){
+            input.classList.add("input-error");
+            document.querySelector("#social-container .error-text").innerText = "Each link is required";
+            valid = false;
+        } else {
+            socials.push(val);
+        }
+    });
+
+    if(hasDuplicates(socials)){
+        document.querySelector("#social-container .error-text").innerText = "Duplicate social links not allowed";
+        valid = false;
+    }
+
+    if(valid){
+        this.submit();
+    }
+});
+
+// ===== ADD / REMOVE EMAIL =====
+function addEmail(){
+    document.getElementById("email-container").insertAdjacentHTML("beforeend", `
+        <div class="flex gap-2 mb-2">
+            <input type="email" name="email[]" class="w-full border p-2 rounded">
+            <button type="button" onclick="removeRow(this,'email-container')" class="text-red-500 remove-btn">✖</button>
+        </div>
+    `);
+    updateButtons("email-container");
+}
+
+// ===== ADD / REMOVE PHONE =====
+function addPhone(){
+    document.getElementById("phone-container").insertAdjacentHTML("beforeend", `
+        <div class="flex gap-2 mb-2">
+            <select name="code[]" class="border p-2 rounded">
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+                <option value="+61">+61</option>
+                <option value="+971">+971</option>
+            </select>
+            <input type="text" name="phone[]" oninput="validatePhone(this)" class="w-full border p-2 rounded">
+            <button type="button" onclick="removeRow(this,'phone-container')" class="text-red-500 remove-btn">✖</button>
+        </div>
+    `);
+    updateButtons("phone-container");
+}
+
+// ===== ADD / REMOVE SOCIAL =====
+function addSocial(){
+    document.getElementById("social-container").insertAdjacentHTML("beforeend", `
+        <div class="flex gap-2 mb-2">
+            <select name="platform[]" class="border p-2 rounded">
+                <option>Instagram</option>
+                <option>LinkedIn</option>
+                <option>Facebook</option>
+                <option>Twitter</option>
+                <option>Website</option>
+            </select>
+            <input type="url" name="link[]" class="w-full border p-2 rounded">
+            <button type="button" onclick="removeRow(this,'social-container')" class="text-red-500 remove-btn">✖</button>
+        </div>
+    `);
+    updateButtons("social-container");
+}
+
+// ===== REMOVE ROW =====
+function removeRow(btn, containerId){
+    btn.parentElement.remove();
+    document.querySelector(`#${containerId} .error-text`).innerText = "";
+    updateButtons(containerId);
+}
+
+// ===== SAVE FORM DATA =====
+function saveFormData() {
+    const formData = {
+        company: document.querySelector("[name='company']")?.value || "",
+        owner: document.querySelector("[name='owner']")?.value || "",
+        ceo: document.querySelector("[name='ceo']")?.value || "",
+        manager: document.querySelector("[name='manager']")?.value || "",
+        address: document.querySelector("[name='address']")?.value || "",
+        emails: [],
+        phones: [],
+        codes: [],
+        socials: [],
+        platforms: []
+    };
+
+    document.querySelectorAll("input[name='email[]']").forEach(el => {
+        formData.emails.push(el.value);
+    });
+
+    document.querySelectorAll("input[name='phone[]']").forEach(el => {
+        formData.phones.push(el.value);
+    });
+
+    document.querySelectorAll("select[name='code[]']").forEach(el => {
+        formData.codes.push(el.value);
+    });
+
+    document.querySelectorAll("input[name='link[]']").forEach(el => {
+        formData.socials.push(el.value);
+    });
+
+    document.querySelectorAll("select[name='platform[]']").forEach(el => {
+        formData.platforms.push(el.value);
+    });
+
+    localStorage.setItem("contactFormData", JSON.stringify(formData));
+}
+
+
+// ===== RESTORE FORM DATA =====
+function restoreFormData() {
+    const saved = localStorage.getItem("contactFormData");
+    if(!saved) return;
+
+    const formData = JSON.parse(saved);
+
+    document.querySelector("[name='company']").value = formData.company || "";
+    document.querySelector("[name='owner']").value = formData.owner || "";
+    document.querySelector("[name='ceo']").value = formData.ceo || "";
+    document.querySelector("[name='manager']").value = formData.manager || "";
+    document.querySelector("[name='address']").value = formData.address || "";
+
+    // Emails
+    while(document.querySelectorAll("input[name='email[]']").length < formData.emails.length){
+        addEmail();
+    }
+    document.querySelectorAll("input[name='email[]']").forEach((el,i)=>{
+        el.value = formData.emails[i] || "";
+    });
+
+    // Phones
+    while(document.querySelectorAll("input[name='phone[]']").length < formData.phones.length){
+        addPhone();
+    }
+    document.querySelectorAll("input[name='phone[]']").forEach((el,i)=>{
+        el.value = formData.phones[i] || "";
+    });
+
+    document.querySelectorAll("select[name='code[]']").forEach((el,i)=>{
+        el.value = formData.codes[i] || "+91";
+    });
+
+    // Socials
+    while(document.querySelectorAll("input[name='link[]']").length < formData.socials.length){
+        addSocial();
+    }
+    document.querySelectorAll("input[name='link[]']").forEach((el,i)=>{
+        el.value = formData.socials[i] || "";
+    });
+
+    document.querySelectorAll("select[name='platform[]']").forEach((el,i)=>{
+        el.value = formData.platforms[i] || "Instagram";
+    });
+}
+
+
+// ===== AUTO SAVE =====
+document.addEventListener("input", saveFormData);
+document.addEventListener("change", saveFormData);
+
+
+// ===== RESTORE ON PAGE LOAD =====
+window.addEventListener("load", restoreFormData);
+
+
+// ===== CLEAR FORM DATA AFTER SUCCESSFUL SUBMIT =====
+document.getElementById("contactForm").addEventListener("submit", function(){
+    localStorage.removeItem("contactFormData");
+});
+
+</script>
+
+{% endblock %}
