@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+
+<h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
+
+<form method="POST">
+{% csrf_token %}
+
+<input name="username" placeholder="Username"
+class="w-full p-3 mb-3 border rounded-lg" required>
+
+<input name="email" type="email" placeholder="Email"
+class="w-full p-3 mb-3 border rounded-lg" required>
+
+<input name="password" type="password" placeholder="Password"
+class="w-full p-3 mb-3 border rounded-lg" required>
+
+<input name="confirm" type="password" placeholder="Confirm Password"
+class="w-full p-3 mb-4 border rounded-lg" required>
+
+<button class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold">
+Register
+</button>
+
+</form>
+
+<p class="text-center mt-4 text-sm">
+Already have account?
+<a href="{% url 'login' %}" class="text-blue-600 font-semibold">Login</a>
+</p>
+
+</div>
+
+</body>
+</html>
