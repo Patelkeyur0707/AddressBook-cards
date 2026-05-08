@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% block title %}Edit Contact{% endblock %}
+
+{% block content %}
+
+<style>
+body{background:#f4f6fb;}
+.wrapper{max-width:1100px;margin:auto;padding:20px;}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.title{
+font-size:22px;
+font-weight:700;
+color:#111827;
+}
+
+.card{
+background:white;
+border-radius:14px;
+padding:18px;
+margin-bottom:16px;
+box-shadow:0 6px 20px rgba(0,0,0,0.06);
+}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+@media(max-width:768px){
+.grid-2,.grid-3{grid-template-columns:1fr;}
+}
+
+.label{
+font-size:12px;
+font-weight:600;
+color:#374151;
+margin-bottom:5px;
+display:block;
+}
+
+.input{
+width:100%;
+padding:10px 12px;
+border:1px solid #e5e7eb;
+border-radius:10px;
+outline:none;
+transition:0.2s;
+background:#fff;
+}
+
+.section-title{
+font-size:15px;
+font-weight:700;
+margin-bottom:12px;
+color:#111827;
+}
+
+.row{display:flex;gap:10px;margin-bottom:10px;align-items:center;}
+.row select{flex:0 0 160px;}
+.row input{flex:1;}
+
+.btn{
+background:#4f46e5;
+color:white;
+padding:10px 16px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+.back-btn{
+background:#e5e7eb;
+color:#111827;
+padding:8px 14px;
+border-radius:8px;
+text-decoration:none;
+font-size:13px;
+font-weight:600;
+}
+
+/* ✅ NEW IMAGE BOX (FROM YOUR SECOND CODE) */
+.img-box{
+width:100%;
+height:200px;
+margin-top:8px;
+border-radius:10px;
+overflow:hidden;
+background:#f3f4f6;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.img-box img{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+}
+
+.small-btn{
+color:#4f46e5;
+font-size:13px;
+margin-top:6px;
+display:inline-block;
+}
+
+</style>
+
+<div class="wrapper">
+
+<div class="header">
+<div class="title">Edit Contact</div>
+
+{% if request.GET.next == 'list' %}
+<a href="{% url 'list' %}" class="back-btn">← Back</a>
+{% else %}
+<a href="{% url 'dashboard' %}" class="back-btn">← Back</a>
+{% endif %}
+</div>
+
+<form id="myForm" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<!-- BASIC (UNCHANGED) -->
+<div class="card">
+<div class="section-title">Basic Information</div>
+<div class="grid-2">
+
+<div>
+<label class="label">Company</label>
+<input class="input" name="company" value="{{contact.company}}">
+</div>
+
+<div>
+<label class="label">Owner</label>
+<input class="input" name="owner" value="{{contact.owner}}">
+</div>
+
+<div>
+<label class="label">CEO</label>
+<input class="input" name="ceo" value="{{contact.ceo}}">
+</div>
+
+<div>
+<label class="label">Manager</label>
+<input class="input" name="manager" value="{{contact.manager}}">
+</div>
+
+</div>
+</div>
+
+<!-- EMAIL (UNCHANGED) -->
+<div class="card">
+<div class="section-title">Emails</div>
+<div id="email-container">
+{% for email in emails %}
+<div class="row">
+<input class="input" name="email[]" value="{{email}}">
+<button type="button" class="remove" onclick="this.parentElement.remove()">X</button>
+</div>
+{% endfor %}
+</div>
+<div class="small-btn" onclick="addEmail()">+ Add Email</div>
+</div>
+
+<!-- PHONE (UNCHANGED) -->
+<div class="card">
+<div class="section-title">Phones</div>
+<div id="phone-container">
+{% for phone in phones %}
+<div class="row">
+<select class="input" name="code[]">
+<option selected>{{phone.code}}</option>
+<option>+91</option>
+<option>+1</option>
+<option>+44</option>
+</select>
+<input class="input" name="phone[]" value="{{phone.number}}">
+<button type="button" class="remove" onclick="this.parentElement.remove()">X</button>
+</div>
+{% endfor %}
+</div>
+<div class="small-btn" onclick="addPhone()">+ Add Phone</div>
+</div>
+
+<!-- SOCIAL (UNCHANGED) -->
+<div class="card">
+<div class="section-title">Social Links</div>
+<div id="social-container">
+{% for social in socials %}
+<div class="row">
+<select class="input" name="platform[]">
+<option selected>{{social.platform}}</option>
+<option>Instagram</option>
+<option>LinkedIn</option>
+<option>Facebook</option>
+<option>Twitter</option>
+<option>Website</option>
+</select>
+<input class="input" name="link[]" value="{{social.link}}">
+<button type="button" class="remove" onclick="this.parentElement.remove()">X</button>
+</div>
+{% endfor %}
+</div>
+<div class="small-btn" onclick="addSocial()">+ Add Social</div>
+</div>
+
+<!-- 🔥 IMAGES (REPLACED WITH YOUR NEW DESIGN) -->
+<div class="card">
+<div class="section-title">Images</div>
+<div class="grid-3">
+
+<!-- FRONT -->
+<div>
+<label class="label">Front Image</label>
+<input type="file" name="front_image" class="input"
+onchange="previewImage(event,'frontPreview','frontName')">
+
+<div id="frontName" class="small-btn">
+{% if contact.front_image %}
+{{ contact.front_image.name|cut:"cards/" }}
+{% endif %}
+</div>
+
+<div class="img-box">
+<img id="frontPreview"
+src="{% if contact.front_image %}{{ contact.front_image.url }}{% endif %}"
+style="{% if not contact.front_image %}display:none;{% endif %}">
+</div>
+</div>
+
+<!-- BACK -->
+<div>
+<label class="label">Back Image</label>
+<input type="file" name="back_image" class="input"
+onchange="previewImage(event,'backPreview','backName')">
+
+<div id="backName" class="small-btn">
+{% if contact.back_image %}
+{{ contact.back_image.name|cut:"cards/" }}
+{% endif %}
+</div>
+
+<div class="img-box">
+<img id="backPreview"
+src="{% if contact.back_image %}{{ contact.back_image.url }}{% endif %}"
+style="{% if not contact.back_image %}display:none;{% endif %}">
+</div>
+</div>
+
+<!-- QR -->
+<div>
+<label class="label">QR Code</label>
+<input type="file" name="qr_image" class="input"
+onchange="previewImage(event,'qrPreview','qrName')">
+
+<div id="qrName" class="small-btn">
+{% if contact.qr_image %}
+{{ contact.qr_image.name|cut:"cards/" }}
+{% endif %}
+</div>
+
+<div class="img-box">
+<img id="qrPreview"
+src="{% if contact.qr_image %}{{ contact.qr_image.url }}{% endif %}"
+style="{% if not contact.qr_image %}display:none;{% endif %}">
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="top-actions">
+<button class="btn">Update Contact</button>
+</div>
+
+</form>
+</div>
+
+<script>
+function previewImage(event,id,nameId){
+let file = event.target.files[0];
+if(!file) return;
+
+let reader = new FileReader();
+reader.onload=function(e){
+let img=document.getElementById(id);
+img.src=e.target.result;
+img.style.display="block";
+};
+reader.readAsDataURL(file);
+
+if(nameId){
+document.getElementById(nameId).innerText=file.name;
+}
+}
+</script>
+
+<!-- SUCCESS POPUP -->
+<div id="successPopup"
+     class="{% if success %}fixed{% else %}hidden{% endif %} inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white w-[320px] p-6 rounded-xl shadow-lg text-center">
+
+    <div class="text-green-500 text-5xl mb-3">✔</div>
+
+    <h2 class="text-xl font-bold mb-2">Success!</h2>
+
+    <p class="text-gray-600 mb-4">Contact updated successfully.</p>
+
+    <button type="button"
+            onclick="window.location.href='{% url 'dashboard' %}'"
+            class="bg-blue-600 text-white px-4 py-2 rounded">
+        OK
+    </button>
+
+  </div>
+</div>
+{% endblock %}
